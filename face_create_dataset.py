@@ -1,34 +1,28 @@
 import cv2
 import os
-import json
 
+# Inisialisasi Cascade Classifier dan Webcam
 faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(1) 
+
+# Path utama untuk dataset
 dataset_path = "dataset/"
 
+# Buat folder dataset utama jika belum ada
 if not os.path.exists(dataset_path):
-    os.mkdir(dataset_path)
+    os.makedirs(dataset_path)
     
-person_id = input("Masukan ID Orang(angka): ")
-person_name = input("Masukan Nama Orang: ")
-print(f"\n[INFO]) Dataset akan dibuat untuk ID: {person_id} dan Nama: {person_name}")
+person_name = input("Masukkan Nama Orang (tanpa spasi): ")
 
-labels_file = 'labels.json'
+# Buat path spesifik untuk orang ini di dalam folder dataset
+person_dataset_path = os.path.join(dataset_path, person_name)
 
-try:
-    with open(labels_file, 'r') as f:
-        labels = json.load(f)
-except (FileNotFoundError, json.JSONDecodeError):
-    labels = {} # buat catatan baru jika file belum ada atau kosong
+# Buat folder untuk orang ini jika belum ada
+if not os.path.exists(person_dataset_path):
+    os.makedirs(person_dataset_path)
 
-# update ID dan nama ke catatan
-labels[person_id] = person_name
-
-# simpan kembali semua data ke file json
-with open(labels_file, 'w') as f:
-    json.dump(labels, f, indent=4)
-    
-print(f"[INFO] Nama '{person_name}' telah disimpan untuk ID {person_id} di {labels_file}")
+print(f"\n[INFO] Dataset akan dibuat untuk: {person_name}. Lihat ke kamera dan tunggu...")
+print(f"Gambar akan disimpan di: {person_dataset_path}")
 
 count = 0
 while True:
@@ -38,21 +32,22 @@ while True:
     
     for (x,y,w,h) in faces:
         cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
-        count+=1
+        count += 1
         
-        # Ambil potongan wajah
         face_crop = gray[y:y+h, x:x+w]
-        # Terapkan Histogram Equalization
         equalized_face = cv2.equalizeHist(face_crop)
         
-        cv2.imwrite(dataset_path+"Person-"+str(person_id) +"-"+str(count)+".jpg", equalized_face)
+        # Simpan gambar ke folder orang yang bersangkutan
+        file_name = f"{count}.jpg"
+        cv2.imwrite(os.path.join(person_dataset_path, file_name), equalized_face)
     
     cv2.imshow("Camera", frame)
     
     if cv2.waitKey(1) == ord('q'):
         break
-    elif count == 50: #stop when 30 photos have been taken 
+    elif count == 50: # Mengambil 50 foto
         break
 
+print(f"\n[INFO] {count} gambar telah diambil dan disimpan.")
 cap.release()
-cv2.destroyAllwindows()
+cv2.destroyAllWindows()
