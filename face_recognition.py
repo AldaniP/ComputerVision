@@ -3,7 +3,7 @@ import json
 
 recognizer = cv2.face.LBPHFaceRecognizer.create()
 recognizer.read("face-model.yml") # face model from face_training.py
-faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
 font = cv2.FONT_HERSHEY_COMPLEX
 
 labels_file = 'labels.json'
@@ -16,12 +16,12 @@ try:
 except FileNotFoundError:
     print("[WARNING] File 'labels.json' tidak ditemukan. Nama tidak akan ditampilkan.")
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 while True:
     _, frame = cap.read()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=20, minSize=(30,30))
+    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30,30))
 
     for (x,y,w,h) in faces:
         cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
@@ -40,7 +40,7 @@ while True:
         Confidence_text = "{0}%".format(round(100-confidence))
         
         # cek confidence
-        if confidence < 40:
+        if confidence < 70:
             name = names.get(str(id), "Tidak Dikenal")
         
         # tampilkan nama dan confidence di frame
