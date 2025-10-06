@@ -4,7 +4,7 @@ import os
 import json
 
 dataset_path = "dataset/"
-faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
 recognizer = cv2.face.LBPHFaceRecognizer.create()
 
 # Periksa apakah folder dataset ada dan tidak kosong
